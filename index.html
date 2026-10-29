@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wartungs-Dashboard | Mercedes-Benz B 180</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --panel-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --text-muted: #a0a0a0;
+            --accent-color: #007bff;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --border-radius: 8px;
+        }
+
+        body.light-mode {
+            --bg-color: #f4f7f6;
+            --panel-bg: #ffffff;
+            --text-color: #333333;
+            --text-muted: #666666;
+            --accent-color: #0056b3;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .btn-toggle {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .panel {
+            background-color: var(--panel-bg);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .panel h2 {
+            margin-top: 0;
+            font-size: 1.2rem;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        /* Status & KPIs */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .kpi {
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            text-align: center;
+        }
+        .kpi .value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .kpi .label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* Tires */
+        .tire-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .tire-group {
+            text-align: center;
+        }
+        .tire-group h3 {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+        .tire-box {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .tire {
+            background: rgba(255,255,255,0.05);
+            padding: 10px;
+            border-radius: var(--border-radius);
+            border-left: 4px solid var(--success-color);
+        }
+        .tire.warning { border-left-color: var(--warning-color); }
+        .tire.danger { border-left-color: var(--danger-color); }
+        .tire-label { font-size: 0.8rem; color: var(--text-muted); }
+        .tire-value { font-size: 1.1rem; font-weight: bold; }
+
+        /* Timeline */
+        .timeline {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .timeline li {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-between;
+        }
+        .timeline li:last-child {
+            border-bottom: none;
+        }
+        .timeline-date {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            min-width: 90px;
+        }
+        .timeline-content {
+            flex-grow: 1;
+        }
+        .timeline-km {
+            font-weight: bold;
+            font-size: 0.9rem;
+            text-align: right;
+            color: var(--accent-color);
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+        .badge-success { background: var(--success-color); color: #fff; }
+        .badge-warning { background: var(--warning-color); color: #212529; }
+        .badge-danger { background: var(--danger-color); color: #fff; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div>
+            <h1>Mercedes-Benz B 180 Wartungs-Dashboard</h1>
+            <span style="color: var(--text-muted); font-size: 0.9rem;">W 246 / EZ 09.02.2015 | Motor M 270.910</span>
+        </div>
+        <button class="btn-toggle" onclick="toggleTheme()">Theme wechseln</button>
+    </header>
+
+    <div class="dashboard-grid">
+        <!-- Status Panel -->
+        <div class="panel">
+            <h2>Aktueller Status</h2>
+            <div class="kpi-grid">
+                <div class="kpi">
+                    <div class="value">125.747</div>
+                    <div class="label">Kilometerstand</div>
+                </div>
+                <div class="kpi">
+                    <div class="value" style="color: var(--success-color)">04.2028</div>
+                    <div class="label">Nächste HU / TÜV</div>
+                </div>
+                <div class="kpi">
+                    <div class="value">01.2027</div>
+                    <div class="label">Nächster Service (A)</div>
+                </div>
+                <div class="kpi">
+                    <div class="value">01.2028</div>
+                    <div class="label">Bremsflüssigkeit</div>
+                </div>
+            </div>
+            <div style="margin-top: 20px;">
+                <strong>System-Hinweise:</strong><br>
+                <span class="badge badge-success">Keine kritischen Fehler</span>
+                <span class="badge badge-warning">Service A naht</span>
+            </div>
+        </div>
+
+        <!-- Tire Status -->
+        <div class="panel">
+            <h2>8-Reifen-Status</h2>
+            <div class="tire-container">
+                <!-- Winterreifen -->
+                <div class="tire-group">
+                    <h3>Winterreifen (Montiert)</h3>
+                    <div class="tire-box">
+                        <div class="tire">
+                            <div class="tire-label">VL (Neu 01/26)</div>
+                            <div class="tire-value">7.5 mm</div>
+                        </div>
+                        <div class="tire">
+                            <div class="tire-label">VR (Neu 01/26)</div>
+                            <div class="tire-value">7.5 mm</div>
+                        </div>
+                        <div class="tire warning">
+                            <div class="tire-label">HL</div>
+                            <div class="tire-value">5.0 mm</div>
+                        </div>
+                        <div class="tire warning">
+                            <div class="tire-label">HR</div>
+                            <div class="tire-value">5.0 mm</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Sommerreifen -->
+                <div class="tire-group">
+                    <h3>Sommerreifen (Eingelagert)</h3>
+                    <div class="tire-box">
+                        <div class="tire">
+                            <div class="tire-label">VL (Neu 05/23)</div>
+                            <div class="tire-value">6.0 mm</div>
+                        </div>
+                        <div class="tire">
+                            <div class="tire-label">VR (Neu 05/23)</div>
+                            <div class="tire-value">6.0 mm</div>
+                        </div>
+                        <div class="tire">
+                            <div class="tire-label">HL (Neu 11/22)</div>
+                            <div class="tire-value">5.5 mm</div>
+                        </div>
+                        <div class="tire">
+                            <div class="tire-label">HR (Neu 11/22)</div>
+                            <div class="tire-value">5.5 mm</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Prognose & Wartungsintervalle -->
+        <div class="panel">
+            <h2>Wartungs-Prognose</h2>
+            <ul class="timeline">
+                <li>
+                    <span class="timeline-date">Frühjahr 2027</span>
+                    <span class="timeline-content">Saisonaler Radwechsel (Sommer)</span>
+                    <span class="timeline-km">~132.000 km</span>
+                </li>
+                <li>
+                    <span class="timeline-date">Jan 2027</span>
+                    <span class="timeline-content">Service A (Öl, Filter)</span>
+                    <span class="timeline-km">~142.000 km</span>
+                </li>
+                <li>
+                    <span class="timeline-date">Jan 2028</span>
+                    <span class="timeline-content">Service B + Bremsflüssigkeit</span>
+                    <span class="timeline-km">~155.000 km</span>
+                </li>
+                <li>
+                    <span class="timeline-date">Apr 2028</span>
+                    <span class="timeline-content">TÜV / HU</span>
+                    <span class="timeline-km">~158.000 km</span>
+                </li>
+                <li>
+                    <span class="timeline-date">2029</span>
+                    <span class="timeline-content">Zündkerzen & Luftfilter fällig</span>
+                    <span class="timeline-km">~163.000 km</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Historie -->
+        <div class="panel">
+            <h2>Letzte Historie</h2>
+            <ul class="timeline">
+                <li>
+                    <span class="timeline-date">16.10.2026</span>
+                    <span class="timeline-content">Radwechsel Winter</span>
+                    <span class="timeline-km">125.747 km</span>
+                </li>
+                <li>
+                    <span class="timeline-date">23.04.2026</span>
+                    <span class="timeline-content">TÜV / HU (Mängelfrei), 4x RDK Sensoren erneuert</span>
+                    <span class="timeline-km">119.814 km</span>
+                </li>
+                <li>
+                    <span class="timeline-date">19.01.2026</span>
+                    <span class="timeline-content">Service B, Bremsen VA/HA komplett, Kühlmittel, Kraftstofffilter, 2x Winterreifen neu</span>
+                    <span class="timeline-km">~117.000 km</span>
+                </li>
+                <li>
+                    <span class="timeline-date">26.09.2024</span>
+                    <span class="timeline-content">Service A, Bordnetzbatterie erneuert</span>
+                    <span class="timeline-km">99.650 km</span>
+                </li>
+                <li>
+                    <span class="timeline-date">04.10.2023</span>
+                    <span class="timeline-content">Service B, Zündkerzen, Luftfilter</span>
+                    <span class="timeline-km">83.727 km</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function toggleTheme() {
+            document.body.classList.toggle('light-mode');
+        }
+    </script>
+</body>
+</html>
